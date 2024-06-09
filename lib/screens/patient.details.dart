@@ -55,66 +55,43 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     final id = arguments['id'] as int;
     fetchPatientDetails(id);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        foregroundColor: appBarTitle,
-        title: const Text(
-          'Patient Details',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      // show circular indicator while fetching data
-      body: BlocBuilder<CurrentPatientInfo, Map<String, dynamic>>(
-        builder: (context, state) {
-          if (state.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: borderGrey,
-                      width: 1,
-                    ),
+    return DefaultTabController(
+      length: 5,
+      child: DefaultTabController(
+        length: 4,
+        child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              bottom: const TabBar(
+                tabs: [
+                  Tab(
+                    text: 'Profile',
                   ),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: ButtonBar(
-                    alignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox(width: 3),
-                      buttonBarBtn("PROFILE", () {}),
-                      buttonBarBtn("MEDICATION", () {}),
-                      buttonBarBtn("CHARTS", () {}),
-                      buttonBarBtn("DOCUMENTS", () {}),
-                      const SizedBox(width: 3),
-                    ],
+                  Tab(
+                    text: 'Medications',
                   ),
+                  Tab(
+                    text: 'Charts',
+                  ),
+                  Tab(
+                    text: 'Documents',
+                  ),
+                ],
+              ),
+              surfaceTintColor: Colors.white,
+              foregroundColor: appBarTitle,
+              title: const Text(
+                'Patient Details',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: subScreens[subScreenIndex[currentPage]!],
-              ),
-            ],
-          );
-        },
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              elevation: 0,
+            ),
+            body: TabBarView(children: subScreens)),
       ),
     );
   }

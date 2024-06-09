@@ -27,12 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
     authInfoCubit.updateAccessToken(accessToken);
     final patients = await dbservice.fetchPatients(accessToken);
     patientsCubit.updatePatients(patients);
-    print(patientsCubit.state.toString());
   }
+
+  bool showSearch = false;
+  TextEditingController searchController = TextEditingController();
+  List currentPatientInfoCubit = [];
 
   @override
   Widget build(BuildContext context) {
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    final patients = BlocProvider.of<PatientsCubit>(context);
 
     fetchPatients();
     return Scaffold(
@@ -42,47 +46,98 @@ class _HomeScreenState extends State<HomeScreen> {
             const EdgeInsets.only(top: Orientation.portrait == true ? 10 : 20),
         child: SafeArea(
           bottom: false,
-          child: Column(
-            children: [
-              Expanded(
-                flex: flexTop,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      topBar(authInfoCubit),
-                      const SizedBox(height: 20),
-                      title("Reminders"),
-                    ],
-                  ),
+          child: Column(children: [
+            Expanded(
+              flex: flexTop,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    topBar(authInfoCubit),
+                    const SizedBox(height: 20),
+                    title("Reminders"),
+                  ],
                 ),
               ),
-              Expanded(
-                flex: flexBottom,
-                child: DraggableScrollableSheet(
-                    initialChildSize: 1,
-                    minChildSize: 0.99999,
-                    builder: (context, ScrollController scrollController) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
-                          ),
+            ),
+            Expanded(
+              flex: flexBottom,
+              child: DraggableScrollableSheet(
+                  initialChildSize: 1,
+                  minChildSize: 0.99999,
+                  builder: (context, ScrollController scrollController) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
                         ),
-                        child: Column(
+                      ),
+                      child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             const SizedBox(height: 20),
-                            title("Patients"),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                title("Your Patients"),
+                                IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        currentPatientInfoCubit =
+                                            patients.state['results'];
+                                        showSearch = !showSearch;
+                                      });
+                                    },
+                                    icon: Icon(
+                                        showSearch
+                                            ? Icons.close
+                                            : Icons.search_rounded,
+                                        color: primaryColor,
+                                        size: 30))
+                              ],
+                            ),
+                            if (showSearch) ...[
+                              const SizedBox(height: 10),
+                              TextField(
+                                controller: searchController,
+                                onChanged: (value) {
+                                  patients.updatePatients({
+                                    'results': currentPatientInfoCubit
+                                        .where((element) => element['name']
+                                            .toString()
+                                            .toLowerCase()
+                                            .contains(value.toLowerCase()))
+                                        .toList(),
+                                    'count': currentPatientInfoCubit
+                                        .where((element) => element['name']
+                                            .toString()
+                                            .toLowerCase()
+                                            .contains(value.toLowerCase()))
+                                        .toList()
+                                        .length
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  enabled: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  isCollapsed: true,
+                                  isDense: true,
+                                  hintText: "Search for patients",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 20),
                             Expanded(
-                              // put a future builder that shows loading indicitor while data loads
                               child: BlocBuilder<PatientsCubit,
                                   Map<String, dynamic>>(
                                 builder: (context, state) {
@@ -132,58 +187,56 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             15),
                                                   ),
                                                   height: 75,
-                                                  child: Row(
-                                                    children: [
-                                                      const CircleAvatar(),
-                                                      const SizedBox(width: 10),
-                                                      SizedBox(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.55,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                                "${state['results'][index]['name'].toString()[0].toUpperCase()}${state['results'][index]['name'].toString().substring(1)}",
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 18,
-                                                                  color:
-                                                                      primaryColor,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                )),
-                                                            Text(
-                                                              "Last updated: ${formatTimestamp(state['results'][index]['updated_at'])}",
+                                                  child: Row(children: [
+                                                    const CircleAvatar(),
+                                                    const SizedBox(width: 10),
+                                                    SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.55,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                              "${state['results'][index]['name'].toString()[0].toUpperCase()}${state['results'][index]['name'].toString().substring(1)}",
                                                               style:
                                                                   const TextStyle(
+                                                                fontSize: 18,
                                                                 color:
                                                                     primaryColor,
-                                                              ),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              )),
+                                                          Text(
+                                                            "Last updated: ${formatTimestamp(state['results'][index]['updated_at'])}",
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  primaryColor,
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                      const Spacer(),
-                                                      const Icon(
-                                                        Icons
-                                                            .chevron_right_rounded,
-                                                        color: primaryColor,
-                                                        size: 30,
-                                                      )
-                                                    ],
-                                                  ),
+                                                    ),
+                                                    const Spacer(),
+                                                    const Icon(
+                                                      Icons
+                                                          .chevron_right_rounded,
+                                                      color: primaryColor,
+                                                      size: 30,
+                                                    )
+                                                  ]),
                                                 ),
                                               );
                                             },
@@ -192,13 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 },
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }),
-              ),
-            ],
-          ),
+                          ]),
+                    );
+                  }),
+            )
+          ]),
         ),
       ),
     );

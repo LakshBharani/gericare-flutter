@@ -11,9 +11,6 @@ const Color appBarTitle = Color.fromARGB(255, 51, 41, 46);
 
 // links to logos
 const String logoPath = 'assets/logo.png';
-const String googleIconPath = 'assets/google-icon.png';
-const String appleLogoURL = 'assets/apple-icon.png';
-const String facebookLogoURL = 'assets/facebook-icon.png';
 
 // styling
 const borderOutlineStyle = OutlineInputBorder(
