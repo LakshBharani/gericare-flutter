@@ -42,7 +42,19 @@ class ProfileSubSection extends StatelessWidget {
             profileItem4("Surgical", state['surgical_history']),
             subTitle("FALL RISK"),
             profileItem5(state['fall_risk']),
-            const SizedBox(height: 200),
+            subTitle("RESPIRATORY"),
+            profileItem6(
+                "Airway Blocked", state['respiratory']['airway_blocked']),
+            profileItem6("ET Tube", state['respiratory']['et_tube']),
+            profileItem6("Tracheostomy", state['respiratory']['tracheostomy']),
+            profileItem7(
+                "Breath Sounds", state['respiratory']['breath_sounds']),
+            profileItem8(
+                "Requires Oxygen", state['respiratory']['requires_o2']),
+            profileItem8("Requires Suctioning",
+                state['respiratory']['requires_suctioning']),
+            profileItem7("Others", state['respiratory']['others']),
+            const SizedBox(height: 100),
           ],
         );
       },
@@ -115,7 +127,7 @@ Widget profileItem1(String title, String value) {
             title,
             style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: primaryColor,
             ),
           ),
@@ -184,7 +196,7 @@ Widget profileItem3(String title, List habits) {
           title,
           style: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: primaryColor,
           ),
         ),
@@ -234,12 +246,12 @@ Widget profileItem4(String title, List value) {
             title,
             style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: primaryColor,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
             child: Wrap(
               children: [
                 Text(
@@ -270,12 +282,12 @@ Widget profileItem4(String title, List value) {
           title,
           style: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: primaryColor,
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
           child: Wrap(
             children: [
               Text(
@@ -307,7 +319,7 @@ Widget profileItem5(String risk) {
             "Fall Risk",
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: primaryColor,
             ),
           ),
@@ -373,6 +385,146 @@ Widget profileItem5(String risk) {
             ],
           ),
         ),
+      ],
+    ),
+  );
+}
+
+Widget profileItem6(String title, bool value) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 10, top: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: primaryColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: !value ? primaryColor : secondaryColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Icon(Icons.close,
+                    color: !value ? Colors.white : primaryColor, size: 24),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: value ? primaryColor : secondaryColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Icon(Icons.check,
+                    color: value ? Colors.white : primaryColor, size: 24),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+Widget profileItem7(String title, String subtitle) {
+  if (subtitle == "") {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 18, right: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+            child: Wrap(
+              children: [
+                Text(
+                  "No ${title.toLowerCase()}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: appBarTitle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  return Padding(
+    padding: const EdgeInsets.only(left: 10, top: 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: primaryColor,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+          child: Wrap(
+            children: [
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: appBarTitle,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget profileItem8(String title, bool value) {
+  return Padding(
+    padding: const EdgeInsets.only(left: 10, top: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: primaryColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Switch(value: value, onChanged: (value) {}),
       ],
     ),
   );
