@@ -129,4 +129,69 @@ class DbService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  // get care chart records using a bearer access token from the server
+  Future<Map<String, dynamic>> fetchCareChartRecords(String accessToken) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/charts/care/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // get vital chart records using a bearer access token from the server
+  Future<Map<String, dynamic>> fetchVitalChartRecords(
+      String accessToken) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/charts/vitals/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

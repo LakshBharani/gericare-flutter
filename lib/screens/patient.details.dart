@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/auth_info.dart';
+import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/screens/home.dart';
 import 'package:gericare/widgets/patient-details/charts.dart';
@@ -44,7 +45,24 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     authInfoCubit.updateAccessToken(accessToken);
     final patientData = await dbservice.fetchPatientData(id, accessToken);
     currentPatientInfoCubit.updateData(patientData);
-    print(currentPatientInfoCubit.state.toString());
+  }
+
+  void fetchCareChartData() {
+    final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
+    final authCubit = BlocProvider.of<AuthInfoCubit>(context);
+    final accessToken = authCubit.state['access_token'];
+    dbservice.fetchCareChartRecords(accessToken).then((value) {
+      chartsCubit.updateCharts("care", value);
+    });
+  }
+
+  void fetchVitalsChartData() {
+    final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
+    final authCubit = BlocProvider.of<AuthInfoCubit>(context);
+    final accessToken = authCubit.state['access_token'];
+    dbservice.fetchVitalChartRecords(accessToken).then((value) {
+      chartsCubit.updateCharts("vitals", value);
+    });
   }
 
   @override
@@ -54,6 +72,8 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
         <String, dynamic>{}) as Map;
     final id = arguments['id'] as int;
     fetchPatientDetails(id);
+    fetchCareChartData();
+    fetchVitalsChartData();
 
     return DefaultTabController(
       length: 5,

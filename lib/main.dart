@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/auth_info.dart';
+import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/cubits/patients_info.dart';
 import 'package:gericare/screens/home.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => AuthInfoCubit()),
         BlocProvider(create: (context) => PatientsCubit()),
         BlocProvider(create: (context) => CurrentPatientInfo()),
+        BlocProvider(create: (context) => ChartsInfoCubit()),
       ],
       child: MaterialApp(
         title: 'GeriCare',

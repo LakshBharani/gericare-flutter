@@ -26,6 +26,6 @@ const errorBorderOutlineStyle = OutlineInputBorder(
 // Function to convert ISO 8601 timestamp to human-readable format
 String formatTimestamp(String timestamp) {
   DateTime parsedDate = DateTime.parse(timestamp);
-  var formatter = DateFormat('d MMM, yyyy');
+  var formatter = DateFormat('dd MMM, yyyy');
   return formatter.format(parsedDate);
 }

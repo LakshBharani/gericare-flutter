@@ -106,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 10),
                               TextField(
                                 controller: searchController,
+                                autofocus: true,
                                 onChanged: (value) {
                                   patients.updatePatients({
                                     'results': currentPatientInfoCubit
@@ -153,7 +154,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: state['count'] == 0
                                         ? Center(
                                             child: Text(
-                                              "Add patients to view here",
+                                              searchController.text.isNotEmpty
+                                                  ? "No patients found"
+                                                  : "Add patients to view here",
                                               style: TextStyle(
                                                 color: Colors.grey.shade400,
                                                 fontSize: 18,
