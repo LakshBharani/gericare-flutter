@@ -16,7 +16,7 @@ class ChartsSubSection extends StatefulWidget {
 
 class _ChartsSubSectionState extends State<ChartsSubSection> {
   DbService dbservice = DbService();
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   List<DateTime> _highlightedDates = [];
 
@@ -31,30 +31,26 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
           );
         }
 
+        // Filter data based on the selected day
+        final selectedDate = _selectedDay.toIso8601String().split('T')[0];
+        final filteredCareData = state['care']?['results'].where((element) {
+          final date = element['date_time'].toString().split('T')[0];
+          return date == selectedDate;
+        }).toList();
+        final filteredVitalsData = state['vitals']?['results'].where((element) {
+          final date = element['date_time'].toString().split('T')[0];
+          return date == selectedDate;
+        }).toList();
+
         // Extract highlighted dates from care and vitals data
         _highlightedDates = [
-          ...state['care']!['results'].map<DateTime>((e) {
+          ...?state['care']?['results']?.map<DateTime>((e) {
             return DateTime.parse(e['date_time']).toLocal();
           }).toList(),
-          ...state['vitals']!['results'].map<DateTime>((e) {
+          ...?state['vitals']?['results']?.map<DateTime>((e) {
             return DateTime.parse(e['date_time']).toLocal();
           }).toList(),
         ];
-
-        // Filter data based on the selected day
-        final selectedDate = _selectedDay?.toIso8601String().split('T')[0];
-        final filteredCareData = selectedDate != null
-            ? state['care']!['results'].where((element) {
-                final date = element['date_time'].toString().split('T')[0];
-                return date == selectedDate;
-              }).toList()
-            : state['care']!['results'];
-        final filteredVitalsData = selectedDate != null
-            ? state['vitals']!['results'].where((element) {
-                final date = element['date_time'].toString().split('T')[0];
-                return date == selectedDate;
-              }).toList()
-            : state['vitals']!['results'];
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -211,13 +207,13 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
             return Container(
               margin: const EdgeInsets.all(6.0),
               decoration: const BoxDecoration(
-                color: secondaryColor,
+                color: primaryColor,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   day.day.toString(),
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             );

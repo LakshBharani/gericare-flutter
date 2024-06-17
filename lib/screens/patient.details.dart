@@ -74,6 +74,9 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     fetchPatientDetails(id);
     fetchCareChartData();
     fetchVitalsChartData();
+    final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
+
+    print(chartsCubit.state);
 
     return DefaultTabController(
       length: 5,
