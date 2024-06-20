@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
 
@@ -28,31 +27,6 @@ class DocumentsSubSection extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  Widget lastUpdated() {
-    return Row(
-      children: [
-        const Icon(
-          Icons.check_circle,
-          size: 16,
-          color: greenTick,
-        ),
-        const SizedBox(width: 5),
-        BlocBuilder<CurrentPatientInfo, Map<String, dynamic>>(
-          builder: (context, state) {
-            return Text(
-              "Last updated: ${formatTimestamp(state['updated_at'])}",
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: appBarTitle,
-              ),
-            );
-          },
-        ),
-      ],
     );
   }
 }

@@ -67,6 +67,38 @@ class DbService {
     }
   }
 
+  // get reminders using a bearer access token from the server
+  Future<List<Map<String, dynamic>>> fetchReminders(String accessToken) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/reminders/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final List<dynamic> responseData = List<dynamic>.from(response.data);
+        final List<Map<String, dynamic>> reminders = [];
+        for (var reminder in responseData) {
+          reminders.add(Map<String, dynamic>.from(reminder));
+        }
+        return reminders;
+      } else if (response.statusCode == 401) {
+        return [];
+      } else {
+        // Return the response data with success set to false
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
   // get refreshed access token using refresh token
   Future<Map<String, dynamic>> refreshAccessToken(String refreshToken) async {
     try {
@@ -196,7 +228,7 @@ class DbService {
     }
   }
 
-  // get specific careChare data using id
+  // get specific careChart data using id
   Future<Map<String, dynamic>> fetchCareChartData(
       int id, String accessToken) async {
     try {

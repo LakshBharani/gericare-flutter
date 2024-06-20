@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 // app colors
 const Color primaryColor = Color.fromARGB(255, 99, 18, 60);
 const Color secondaryColor = Color.fromARGB(255, 250, 240, 245);
+const Color teritaryColor = Color.fromARGB(255, 235, 206, 221);
 const Color fillGrey = Color.fromARGB(255, 249, 250, 251);
 const Color borderGrey = Color.fromARGB(255, 229, 231, 235);
 const Color greenTick = Color.fromARGB(255, 35, 201, 52);

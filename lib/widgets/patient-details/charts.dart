@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
+import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
+import 'package:gericare/cubits/selected_care_chart.dart';
 import 'package:gericare/db_service.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -25,7 +29,7 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
     return BlocBuilder<ChartsInfoCubit, Map<String, Map<String, dynamic>>>(
       builder: (context, state) {
         // Check if state is empty
-        if (state.isEmpty) {
+        if (state.isEmpty || state['care'] == null || state['vitals'] == null) {
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -75,6 +79,7 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                               return chartCard(
                                 "Care Chart",
                                 filteredCareData[index]['patient']['name'],
+                                filteredCareData[index]['id'],
                               );
                             } else {
                               final vitalsIndex =
@@ -83,6 +88,7 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                                 "Vitals Chart",
                                 filteredVitalsData[vitalsIndex]['patient']
                                     ['name'],
+                                filteredVitalsData[vitalsIndex]['id'],
                               );
                             }
                           },
@@ -238,53 +244,77 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
     );
   }
 
-  Widget chartCard(String title, String name) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: secondaryColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.medical_services_rounded,
-            color: primaryColor,
-          ),
-          const SizedBox(width: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
-                ),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                child: Text(
-                  name,
+  Widget chartCard(String title, String name, int id) {
+    Future fetchCareChartData() async {
+      final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+      final chartsCubit = BlocProvider.of<SelectedCareChart>(context);
+      String accessToken = authInfoCubit.state['access_token'];
+      final refreshToken = authInfoCubit.state['refresh_token'];
+      final newToken = await dbservice.refreshAccessToken(refreshToken);
+      accessToken = newToken['access'];
+      authInfoCubit.updateAccessToken(accessToken);
+      await dbservice.fetchCareChartData(id, accessToken).then((value) {
+        chartsCubit.updateData(value);
+      });
+    }
+
+    return GestureDetector(
+      onTap: () {
+        if (title == "Care Chart") {
+          fetchCareChartData().then((_) {
+            Navigator.pushNamed(context, '/careChart-details');
+          });
+        } else {
+          Navigator.pushNamed(context, '/vitalsChart-details');
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: secondaryColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.medical_services_rounded,
+              color: primaryColor,
+            ),
+            const SizedBox(width: 24),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                     color: primaryColor,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
                 ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: primaryColor,
-            size: 30,
-          ),
-        ],
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: primaryColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: primaryColor,
+              size: 30,
+            ),
+          ],
+        ),
       ),
     );
   }

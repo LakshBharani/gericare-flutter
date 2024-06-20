@@ -47,19 +47,28 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     currentPatientInfoCubit.updateData(patientData);
   }
 
-  void fetchCareChartData() {
+  void fetchCareChartData() async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
-    final authCubit = BlocProvider.of<AuthInfoCubit>(context);
-    final accessToken = authCubit.state['access_token'];
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
+
     dbservice.fetchCareChartRecords(accessToken).then((value) {
       chartsCubit.updateCharts("care", value);
     });
   }
 
-  void fetchVitalsChartData() {
+  void fetchVitalsChartData() async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
-    final authCubit = BlocProvider.of<AuthInfoCubit>(context);
-    final accessToken = authCubit.state['access_token'];
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
     dbservice.fetchVitalChartRecords(accessToken).then((value) {
       chartsCubit.updateCharts("vitals", value);
     });
@@ -74,9 +83,6 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     fetchPatientDetails(id);
     fetchCareChartData();
     fetchVitalsChartData();
-    final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
-
-    print(chartsCubit.state);
 
     return DefaultTabController(
       length: 5,

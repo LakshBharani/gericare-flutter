@@ -5,10 +5,15 @@ import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/cubits/patients_info.dart';
+import 'package:gericare/cubits/reminders.dart';
+import 'package:gericare/cubits/selected_care_chart.dart';
+import 'package:gericare/cubits/selected_vitals_chart.dart';
+import 'package:gericare/screens/carechart.details.dart';
 import 'package:gericare/screens/home.dart';
 import 'package:gericare/screens/login.dart';
 import 'package:gericare/screens/onboarding.dart';
 import 'package:gericare/screens/patient.details.dart';
+import 'package:gericare/screens/vitalschart.details.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +30,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => PatientsCubit()),
         BlocProvider(create: (context) => CurrentPatientInfo()),
         BlocProvider(create: (context) => ChartsInfoCubit()),
+        BlocProvider(create: (context) => SelectedCareChart()),
+        BlocProvider(create: (context) => SelectedVitalsChart()),
+        BlocProvider(create: (context) => RemindersCubit()),
       ],
       child: MaterialApp(
         title: 'GeriCare',
@@ -39,6 +47,8 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/home': (context) => const HomeScreen(),
           '/patientDetails': (context) => const PatientDetailsScreen(),
+          '/careChart-details': (context) => const CareChartDetailsScreen(),
+          '/vitalsChart-details': (context) => const VitalsChartDetailsScreen(),
         },
       ),
     );
