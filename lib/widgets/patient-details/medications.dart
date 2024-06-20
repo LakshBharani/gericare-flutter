@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/cubits/reminders.dart';
+import 'package:gericare/widgets/expanded_medication.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
 
 class MedicationsSubSection extends StatelessWidget {
@@ -27,7 +28,10 @@ class MedicationsSubSection extends StatelessWidget {
             lastUpdated(),
             subTitle("Allergy Medication"),
             const SizedBox(height: 20),
-            allergyMedicationList(),
+            medicationList("allergies"),
+            subTitle("IV Fluids and Drugs"),
+            const SizedBox(height: 20),
+            medicationList("iv_fluids_and_drugs"),
           ],
         );
       },
@@ -49,7 +53,7 @@ Widget subTitle(String title) {
   );
 }
 
-Widget allergyMedicationList() {
+Widget medicationList(String subList) {
   return BlocBuilder<RemindersCubit, List<Map<String, dynamic>>>(
       builder: (context, medicationList) {
     if (medicationList.isEmpty) {
@@ -58,13 +62,27 @@ Widget allergyMedicationList() {
       );
     }
 
-    // [{patient: Laksh Bharani, master_medication_record: {id: 2, medication_type: iv_fluids_and_drugs, name: Some fluid, dose: 150 mL, frequency: once daily, before_meal: false, notes: Notes test}, time: 10:00}, {patient: Laksh Bharani, master_medication_record: {id: 1, medication_type: allergies, name: Tobramycin, dose: 1 Tablet, frequency: once daily, before_meal: true, notes: -}, time: 15:00}, {patient: Hemali Bharani, master_medication_record: {id: 3, medication_type: allergies, name: Tuberclosis, dose: 2 Tablet, frequency: twice daily, before_meal: false, notes: -}, time: 20:30}]
     return BlocBuilder<CurrentPatientInfo, Map<String, dynamic>>(
         builder: (context, patientState) {
       final patientName = patientState['name'];
       final patientMedicationList = medicationList
           .where((element) => element['patient'] == patientName)
           .toList();
+      patientMedicationList.removeWhere((element) =>
+          element['master_medication_record']['medication_type'] !=
+          subList.toLowerCase());
+      if (patientMedicationList.isEmpty) {
+        return Center(
+          child: Text(
+            "No Medication Found",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey.shade400,
+            ),
+          ),
+        );
+      }
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -72,52 +90,61 @@ Widget allergyMedicationList() {
         itemBuilder: (context, index) {
           final medication = patientMedicationList[index];
           final medicationRecord = medication['master_medication_record'];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: secondaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  medicationRecord['name'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: appBarTitle,
+          return GestureDetector(
+            onTap: () => showCustomBottomSheet(context, medication),
+            child: Container(
+              height: 75,
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: secondaryColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    subList == "allergies"
+                        ? Icons.medication
+                        : Icons.medication_liquid,
+                    color: primaryColor,
+                    size: 30,
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Dose: ${medicationRecord['dose']}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: appBarTitle,
+                  const SizedBox(width: 14),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.65,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${medicationRecord['name']} - ${medicationRecord['dose']}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: primaryColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "Dose: ${medicationRecord['frequency'][0].toUpperCase()}${medicationRecord['frequency'].substring(1)}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: primaryColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  'Frequency: ${medicationRecord['frequency']}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: appBarTitle,
+                  const Spacer(),
+                  const Icon(
+                    Icons.chevron_right,
+                    color: primaryColor,
+                    size: 30,
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  'Time: ${medication['time']}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: appBarTitle,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

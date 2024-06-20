@@ -4,6 +4,7 @@ import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
+import 'package:gericare/cubits/documents_list.dart';
 import 'package:gericare/cubits/patients_info.dart';
 import 'package:gericare/cubits/reminders.dart';
 import 'package:gericare/cubits/selected_care_chart.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => SelectedCareChart()),
         BlocProvider(create: (context) => SelectedVitalsChart()),
         BlocProvider(create: (context) => RemindersCubit()),
+        BlocProvider(create: (context) => DocumentsListCubit()),
       ],
       child: MaterialApp(
         title: 'GeriCare',

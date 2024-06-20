@@ -4,6 +4,7 @@ import 'package:gericare/constants.dart';
 import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
+import 'package:gericare/cubits/documents_list.dart';
 import 'package:gericare/screens/home.dart';
 import 'package:gericare/widgets/patient-details/charts.dart';
 import 'package:gericare/widgets/patient-details/documents.dart';
@@ -55,10 +56,8 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     final newToken = await dbservice.refreshAccessToken(refreshToken);
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
-
-    dbservice.fetchCareChartRecords(accessToken).then((value) {
-      chartsCubit.updateCharts("care", value);
-    });
+    final careChartData = await dbservice.fetchCareChartRecords(accessToken);
+    chartsCubit.updateCharts("care", careChartData);
   }
 
   void fetchVitalsChartData() async {
@@ -69,9 +68,21 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     final newToken = await dbservice.refreshAccessToken(refreshToken);
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
-    dbservice.fetchVitalChartRecords(accessToken).then((value) {
-      chartsCubit.updateCharts("vitals", value);
-    });
+    final vitalChartData = await dbservice.fetchVitalChartRecords(accessToken);
+    chartsCubit.updateCharts("vitals", vitalChartData);
+  }
+
+  void fetchDocuments(int id) async {
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    final documentListCubit = BlocProvider.of<DocumentsListCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
+    final documents = await dbservice.fetchDocuments(accessToken, id);
+    documentListCubit.updateData(documents);
+    print(documentListCubit.state.toString());
   }
 
   @override
@@ -83,6 +94,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     fetchPatientDetails(id);
     fetchCareChartData();
     fetchVitalsChartData();
+    fetchDocuments(id);
 
     return DefaultTabController(
       length: 5,

@@ -5,6 +5,7 @@ import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/patients_info.dart';
 import 'package:gericare/cubits/reminders.dart';
 import 'package:gericare/db_service.dart';
+import 'package:gericare/widgets/expanded_medication.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     authInfoCubit.updateAccessToken(accessToken);
     final patients = await dbservice.fetchPatients(accessToken);
     patientsCubit.updatePatients(patients);
+    print(authInfoCubit.state['access_token']);
   }
 
   void fetchReminders() async {
@@ -96,84 +98,90 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: ListView.builder(
                               itemCount: state.length,
                               itemBuilder: (context, index) {
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  decoration: BoxDecoration(
-                                    color: teritaryColor,
-                                    borderRadius: BorderRadius.circular(15),
-                                  ),
-                                  height: 75,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      state[index]['master_medication_record']
-                                                  ['medication_type'] ==
-                                              'allergies'
-                                          ? const Icon(
-                                              Icons.medication,
-                                              color: primaryColor,
-                                              size: 33,
-                                            )
-                                          : const Icon(
-                                              Icons.medication_liquid,
-                                              color: primaryColor,
-                                              size: 33,
+                                return GestureDetector(
+                                  onTap: () => showCustomBottomSheet(
+                                      context, state[index]),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    decoration: BoxDecoration(
+                                      color: teritaryColor,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    height: 75,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        state[index]['master_medication_record']
+                                                    ['medication_type'] ==
+                                                'allergies'
+                                            ? const Icon(
+                                                Icons.medication,
+                                                color: primaryColor,
+                                                size: 33,
+                                              )
+                                            : const Icon(
+                                                Icons.medication_liquid,
+                                                color: primaryColor,
+                                                size: 33,
+                                              ),
+                                        const SizedBox(width: 15),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.55,
+                                                  child: Text(
+                                                    "${state[index]['time']} hrs | ${state[index]['patient']}",
+                                                    style: const TextStyle(
+                                                      color: primaryColor,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 13,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                      const SizedBox(width: 15),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              SizedBox(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.55,
-                                                child: Text(
-                                                  "${state[index]['time']} hrs | ${state[index]['patient']}",
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${state[index]['master_medication_record']['name']} - ${state[index]['master_medication_record']['dose']}",
                                                   style: const TextStyle(
                                                     color: primaryColor,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 13,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "${state[index]['master_medication_record']['name']} - ${state[index]['master_medication_record']['dose']}",
-                                                style: const TextStyle(
-                                                  color: primaryColor,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(width: 15),
-                                      const Spacer(),
-                                      const Icon(Icons.chevron_right_rounded,
-                                          color: primaryColor, size: 30)
-                                    ],
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(width: 15),
+                                        const Spacer(),
+                                        const Icon(Icons.chevron_right_rounded,
+                                            color: primaryColor, size: 30)
+                                      ],
+                                    ),
                                   ),
                                 );
                               },
@@ -374,7 +382,10 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            const CircleAvatar(radius: 28),
+            // const CircleAvatar(
+            //   radius: 28,
+            //   child: Icon(Icons.emergency, color: primaryColor, size: 30),
+            // ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
