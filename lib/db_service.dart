@@ -228,6 +228,39 @@ class DbService {
     }
   }
 
+  // get emotional chart records using a bearer access token from the server
+  Future<Map<String, dynamic>> fetchEmotionalChartRecords(
+      String accessToken) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/charts/emotions/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   // get specific careChart data using id
   Future<Map<String, dynamic>> fetchCareChartData(
       int id, String accessToken) async {
@@ -261,11 +294,81 @@ class DbService {
     }
   }
 
+  // get specific vitalChart data using id
+  Future<Map<String, dynamic>> fetchVitalChartData(
+      int id, String accessToken) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/charts/vitals/$id/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> fetchDocuments(
       String accessToken, int patientId) async {
     try {
       final response = await dio.get(
         '$baseUrl/patients/$patientId/documents/',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else if (response.statusCode == 400) {
+        return {'success': false, 'error': 'Bad Request'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // fetch a single document using id it returns a body of a pdf file
+  // localhost:8000/api/patients/9/documents/1
+  Future<Map<String, dynamic>> fetchDocument(
+      String accessToken, int patientId, int documentId) async {
+    try {
+      final response = await dio.get(
+        '$baseUrl/patients/$patientId/documents/$documentId/',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',

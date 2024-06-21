@@ -72,6 +72,19 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     chartsCubit.updateCharts("vitals", vitalChartData);
   }
 
+  void fetchEmotionChartData() async {
+    final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
+    final emotionChartData =
+        await dbservice.fetchEmotionalChartRecords(accessToken);
+    chartsCubit.updateCharts("emotion", emotionChartData);
+  }
+
   void fetchDocuments(int id) async {
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
     final documentListCubit = BlocProvider.of<DocumentsListCubit>(context);
@@ -82,7 +95,6 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     authInfoCubit.updateAccessToken(accessToken);
     final documents = await dbservice.fetchDocuments(accessToken, id);
     documentListCubit.updateData(documents);
-    print(documentListCubit.state.toString());
   }
 
   @override
@@ -94,6 +106,7 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     fetchPatientDetails(id);
     fetchCareChartData();
     fetchVitalsChartData();
+    fetchEmotionChartData();
     fetchDocuments(id);
 
     return DefaultTabController(

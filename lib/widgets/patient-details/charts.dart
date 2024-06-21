@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
@@ -7,6 +6,7 @@ import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/cubits/selected_care_chart.dart';
+import 'package:gericare/cubits/selected_vitals_chart.dart';
 import 'package:gericare/db_service.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -45,6 +45,11 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
           final date = element['date_time'].toString().split('T')[0];
           return date == selectedDate;
         }).toList();
+        final filteredEmotionData =
+            state['emotion']?['results'].where((element) {
+          final date = element['date_time'].toString().split('T')[0];
+          return date == selectedDate;
+        }).toList();
 
         // Extract highlighted dates from care and vitals data
         _highlightedDates = [
@@ -52,6 +57,9 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
             return DateTime.parse(e['date_time']).toLocal();
           }).toList(),
           ...?state['vitals']?['results']?.map<DateTime>((e) {
+            return DateTime.parse(e['date_time']).toLocal();
+          }).toList(),
+          ...?state['emotion']?['results']?.map<DateTime>((e) {
             return DateTime.parse(e['date_time']).toLocal();
           }).toList(),
         ];
@@ -68,12 +76,16 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                 lastUpdated(),
                 table(),
                 const SizedBox(height: 20),
-                filteredCareData.length + filteredVitalsData.length != 0
+                filteredCareData.length +
+                            filteredVitalsData.length +
+                            filteredEmotionData.length !=
+                        0
                     ? Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.only(bottom: 100),
                           itemCount: filteredCareData.length +
-                              filteredVitalsData.length,
+                              filteredVitalsData.length +
+                              filteredEmotionData.length,
                           itemBuilder: (context, index) {
                             if (index < filteredCareData.length) {
                               return chartCard(
@@ -81,7 +93,9 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                                 filteredCareData[index]['patient']['name'],
                                 filteredCareData[index]['id'],
                               );
-                            } else {
+                            } else if (index <
+                                filteredCareData.length +
+                                    filteredVitalsData.length) {
                               final vitalsIndex =
                                   index - filteredCareData.length;
                               return chartCard(
@@ -89,6 +103,16 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                                 filteredVitalsData[vitalsIndex]['patient']
                                     ['name'],
                                 filteredVitalsData[vitalsIndex]['id'],
+                              );
+                            } else {
+                              final emotionIndex = index -
+                                  (filteredCareData.length +
+                                      filteredVitalsData.length);
+                              return chartCard(
+                                "Emotion Chart",
+                                filteredEmotionData[emotionIndex]['patient']
+                                    ['name'],
+                                filteredEmotionData[emotionIndex]['id'],
                               );
                             }
                           },
@@ -247,14 +271,27 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
   Widget chartCard(String title, String name, int id) {
     Future fetchCareChartData() async {
       final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
-      final chartsCubit = BlocProvider.of<SelectedCareChart>(context);
+      final careChartsCubit = BlocProvider.of<SelectedCareChart>(context);
       String accessToken = authInfoCubit.state['access_token'];
       final refreshToken = authInfoCubit.state['refresh_token'];
       final newToken = await dbservice.refreshAccessToken(refreshToken);
       accessToken = newToken['access'];
       authInfoCubit.updateAccessToken(accessToken);
       await dbservice.fetchCareChartData(id, accessToken).then((value) {
-        chartsCubit.updateData(value);
+        careChartsCubit.updateData(value);
+      });
+    }
+
+    Future fetchVitalsChartData() async {
+      final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+      final vitalsChartsCubit = BlocProvider.of<SelectedVitalsChart>(context);
+      String accessToken = authInfoCubit.state['access_token'];
+      final refreshToken = authInfoCubit.state['refresh_token'];
+      final newToken = await dbservice.refreshAccessToken(refreshToken);
+      accessToken = newToken['access'];
+      authInfoCubit.updateAccessToken(accessToken);
+      await dbservice.fetchVitalChartData(id, accessToken).then((value) {
+        vitalsChartsCubit.updateData(value);
       });
     }
 
@@ -264,8 +301,10 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
           fetchCareChartData().then((_) {
             Navigator.pushNamed(context, '/careChart-details');
           });
-        } else {
-          Navigator.pushNamed(context, '/vitalsChart-details');
+        } else if (title == "Vitals Chart") {
+          fetchVitalsChartData().then((_) {
+            Navigator.pushNamed(context, '/vitalsChart-details');
+          });
         }
       },
       child: Container(

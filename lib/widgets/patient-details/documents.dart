@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gericare/constants.dart';
@@ -84,7 +83,7 @@ class DocumentsSubSection extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            // Download the document
+                            //
                           },
                           icon: const Icon(Icons.download),
                         ),

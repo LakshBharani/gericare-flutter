@@ -69,6 +69,9 @@ flutter:
     - assets/icons/bp-icon.png
     - assets/icons/hr-icon.png
     - assets/icons/temp-icon.png
+    - assets/icons/spo2-icon.png
+    - assets/icons/slp-icon.png
+    - assets/icons/wmchine-icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
