@@ -8,8 +8,10 @@ import 'package:gericare/cubits/documents_list.dart';
 import 'package:gericare/cubits/patients_info.dart';
 import 'package:gericare/cubits/reminders.dart';
 import 'package:gericare/cubits/selected_care_chart.dart';
+import 'package:gericare/cubits/selected_emotion_chart.dart';
 import 'package:gericare/cubits/selected_vitals_chart.dart';
 import 'package:gericare/screens/carechart.details.dart';
+import 'package:gericare/screens/emotionchart.details.dart';
 import 'package:gericare/screens/home.dart';
 import 'package:gericare/screens/login.dart';
 import 'package:gericare/screens/onboarding.dart';
@@ -33,6 +35,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ChartsInfoCubit()),
         BlocProvider(create: (context) => SelectedCareChart()),
         BlocProvider(create: (context) => SelectedVitalsChart()),
+        BlocProvider(create: (context) => SelectedEmotionChart()),
         BlocProvider(create: (context) => RemindersCubit()),
         BlocProvider(create: (context) => DocumentsListCubit()),
       ],
@@ -51,6 +54,8 @@ class MyApp extends StatelessWidget {
           '/patientDetails': (context) => const PatientDetailsScreen(),
           '/careChart-details': (context) => const CareChartDetailsScreen(),
           '/vitalsChart-details': (context) => const VitalsChartDetailsScreen(),
+          '/emotionsChart-details': (context) =>
+              const EmotionChartDetailsScreen(),
         },
       ),
     );

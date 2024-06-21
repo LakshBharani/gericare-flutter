@@ -57,6 +57,10 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
     final careChartData = await dbservice.fetchCareChartRecords(accessToken);
+    // filter out those records that are not of the current patient
+    careChartData['results'].removeWhere((element) =>
+        element['patient']['id'] !=
+        BlocProvider.of<CurrentPatientInfo>(context).state['id']);
     chartsCubit.updateCharts("care", careChartData);
   }
 
@@ -69,12 +73,18 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
     final vitalChartData = await dbservice.fetchVitalChartRecords(accessToken);
+    // filter out those records that are not of the current patient
+    vitalChartData['results'].removeWhere((element) =>
+        element['patient']['id'] !=
+        BlocProvider.of<CurrentPatientInfo>(context).state['id']);
     chartsCubit.updateCharts("vitals", vitalChartData);
   }
 
   void fetchEmotionChartData() async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    final currentPatientInfoCubit =
+        BlocProvider.of<CurrentPatientInfo>(context);
     String accessToken = authInfoCubit.state['access_token'];
     final refreshToken = authInfoCubit.state['refresh_token'];
     final newToken = await dbservice.refreshAccessToken(refreshToken);
@@ -82,6 +92,10 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     authInfoCubit.updateAccessToken(accessToken);
     final emotionChartData =
         await dbservice.fetchEmotionalChartRecords(accessToken);
+    // filter out those records that are not of the current patient
+    emotionChartData['results'].removeWhere((element) =>
+        element['patient']['id'] != currentPatientInfoCubit.state['id']);
+    emotionChartData['count'] = emotionChartData['results'].length;
     chartsCubit.updateCharts("emotion", emotionChartData);
   }
 

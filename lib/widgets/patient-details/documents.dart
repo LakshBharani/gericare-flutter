@@ -19,6 +19,17 @@ class DocumentsSubSection extends StatelessWidget {
         }
         return BlocBuilder<DocumentsListCubit, Map<String, dynamic>>(
           builder: (context, documentState) {
+            if (documentState['count'] == null) {
+              return Center(
+                child: Text(
+                  'No documents found',
+                  style: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 16,
+                  ),
+                ),
+              );
+            }
             return ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               shrinkWrap: true,

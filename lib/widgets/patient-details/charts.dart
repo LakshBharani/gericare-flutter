@@ -6,6 +6,7 @@ import 'package:gericare/cubits/auth_info.dart';
 import 'package:gericare/cubits/charts_info.dart';
 import 'package:gericare/cubits/current_patient_info.dart';
 import 'package:gericare/cubits/selected_care_chart.dart';
+import 'package:gericare/cubits/selected_emotion_chart.dart';
 import 'package:gericare/cubits/selected_vitals_chart.dart';
 import 'package:gericare/db_service.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
@@ -29,7 +30,10 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
     return BlocBuilder<ChartsInfoCubit, Map<String, Map<String, dynamic>>>(
       builder: (context, state) {
         // Check if state is empty
-        if (state.isEmpty || state['care'] == null || state['vitals'] == null) {
+        if (state.isEmpty ||
+            state['care'] == null ||
+            state['vitals'] == null ||
+            state['emotion'] == null) {
           return const Center(
             child: CircularProgressIndicator(),
           );
@@ -45,6 +49,7 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
           final date = element['date_time'].toString().split('T')[0];
           return date == selectedDate;
         }).toList();
+        // filter emotiondata based on name of patient and date
         final filteredEmotionData =
             state['emotion']?['results'].where((element) {
           final date = element['date_time'].toString().split('T')[0];
@@ -295,6 +300,19 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
       });
     }
 
+    Future fetchEmotionChartData() async {
+      final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+      final emotionChartsCubit = BlocProvider.of<SelectedEmotionChart>(context);
+      String accessToken = authInfoCubit.state['access_token'];
+      final refreshToken = authInfoCubit.state['refresh_token'];
+      final newToken = await dbservice.refreshAccessToken(refreshToken);
+      accessToken = newToken['access'];
+      authInfoCubit.updateAccessToken(accessToken);
+      await dbservice.fetchEmotionalChartData(id, accessToken).then((value) {
+        emotionChartsCubit.updateData(value);
+      });
+    }
+
     return GestureDetector(
       onTap: () {
         if (title == "Care Chart") {
@@ -304,6 +322,10 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
         } else if (title == "Vitals Chart") {
           fetchVitalsChartData().then((_) {
             Navigator.pushNamed(context, '/vitalsChart-details');
+          });
+        } else {
+          fetchEmotionChartData().then((_) {
+            Navigator.pushNamed(context, '/emotionsChart-details');
           });
         }
       },
