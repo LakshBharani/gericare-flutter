@@ -171,7 +171,7 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
         dashPattern: const [8, 4],
         strokeWidth: 2,
         child: Container(
-          height: 65,
+          height: 63,
           decoration: BoxDecoration(
             color: secondaryColor,
             borderRadius: BorderRadius.circular(12),

@@ -198,7 +198,7 @@ class DbService {
 
   // get vital chart records using a bearer access token from the server
   Future<Map<String, dynamic>> fetchVitalChartRecords(
-      String accessToken ,int currentPatientId) async {
+      String accessToken, int currentPatientId) async {
     try {
       final response = await dio.get(
         '$baseUrl/charts/vitals/?patient__id=$currentPatientId',
@@ -412,6 +412,80 @@ class DbService {
 
       // Check if the response is successful
       if (response.statusCode == 200) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else if (response.statusCode == 400) {
+        return {'success': false, 'error': 'Bad Request'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // post a vital chart to db using a json body
+  Future<Map<String, dynamic>> postVitalChart(
+      String accessToken, Map<String, dynamic> vitalChartData) async {
+    try {
+      final response = await dio.post(
+        '$baseUrl/charts/vitals/',
+        data: vitalChartData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // Check if the response is successful
+      if (response.statusCode == 201) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else if (response.statusCode == 400) {
+        return {'success': false, 'error': 'Bad Request'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // post care chart to db using a json body
+  Future<Map<String, dynamic>> postCareChart(
+      String accessToken, Map<String, dynamic> careChartData) async {
+    try {
+      final response = await dio.post(
+        '$baseUrl/charts/care/',
+        data: careChartData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // Check if the response is successful
+      if (response.statusCode == 201) {
         // Add a success indicator to the response data
         final Map<String, dynamic> responseData =
             Map<String, dynamic>.from(response.data);

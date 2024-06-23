@@ -53,11 +53,13 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Spacer(),
+              const Spacer(),
               Image.asset(
                 logoPath,
                 height: 80,
               ),
-              const SizedBox(height: 20),
+              const Spacer(),
               TextFormField(
                 controller: usernameController,
                 keyboardType: TextInputType.emailAddress,
