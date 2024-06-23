@@ -228,15 +228,25 @@ Widget rowItem2(String title, String status) {
 
 Widget rowItem3(BuildContext context) {
   final chartData = BlocProvider.of<SelectedEmotionChart>(context);
+  final notes = chartData.state['notes'];
   return Padding(
     padding: const EdgeInsets.only(left: 10, top: 18, right: 10),
-    child: Text(
-      chartData.state['notes'],
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: primaryColor,
-      ),
-    ),
+    child: notes == "" || notes == null
+        ? const Text(
+            "No notes added",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          )
+        : Text(
+            notes,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
   );
 }

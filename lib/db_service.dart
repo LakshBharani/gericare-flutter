@@ -506,4 +506,41 @@ class DbService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  // post emotional chart to db using a json body
+  Future<Map<String, dynamic>> postEmotionalChart(
+      String accessToken, Map<String, dynamic> emotionalChartData) async {
+    try {
+      final response = await dio.post(
+        '$baseUrl/charts/emotions/',
+        data: emotionalChartData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      // Check if the response is successful
+      if (response.statusCode == 201) {
+        // Add a success indicator to the response data
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = true;
+        return responseData;
+      } else if (response.statusCode == 401) {
+        return {'success': false, 'error': 'Unauthorized'};
+      } else if (response.statusCode == 400) {
+        return {'success': false, 'error': 'Bad Request'};
+      } else {
+        // Return the response data with success set to false
+        final Map<String, dynamic> responseData =
+            Map<String, dynamic>.from(response.data);
+        responseData['success'] = false;
+        return responseData;
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
 }

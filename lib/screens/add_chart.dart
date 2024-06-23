@@ -75,17 +75,27 @@ class _AddchartScreenState extends State<AddchartScreen> {
     "medicines": null,
   };
 
-  final _formKey = GlobalKey<FormState>();
+  List<String> emotionChart = [
+    "Patient",
+    "Medicines Taken",
+    "Adequate Sleep",
+    "Happiness",
+    "Anxiety",
+    "Irritability",
+    "Energy",
+  ];
 
-  Future postVitalChartData() async {
-    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
-    String accessToken = authInfoCubit.state['access_token'];
-    final refreshToken = authInfoCubit.state['refresh_token'];
-    final newToken = await dbservice.refreshAccessToken(refreshToken);
-    accessToken = newToken['access'];
-    authInfoCubit.updateAccessToken(accessToken);
-    dbservice.postVitalChart(accessToken, vitalsValuesJSON);
-  }
+  Map<String, dynamic> emotionChartValuesJSON = {
+    "patient": null,
+    "medicines_taken": false,
+    "adequate_sleep": false,
+    "happiness": null,
+    "anxiety": null,
+    "irritability": null,
+    "energy": null,
+  };
+
+  final _formKey = GlobalKey<FormState>();
 
   Future postCareChartData() async {
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
@@ -97,11 +107,32 @@ class _AddchartScreenState extends State<AddchartScreen> {
     dbservice.postCareChart(accessToken, careChartValuesJSON);
   }
 
+  Future postVitalChartData() async {
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
+    dbservice.postVitalChart(accessToken, vitalsValuesJSON);
+  }
+
+  Future postEmotionChartData() async {
+    final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+    String accessToken = authInfoCubit.state['access_token'];
+    final refreshToken = authInfoCubit.state['refresh_token'];
+    final newToken = await dbservice.refreshAccessToken(refreshToken);
+    accessToken = newToken['access'];
+    authInfoCubit.updateAccessToken(accessToken);
+    dbservice.postEmotionalChart(accessToken, emotionChartValuesJSON);
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentPatient = BlocProvider.of<CurrentPatientInfo>(context).state;
     vitalsValuesJSON["patient"] = currentPatient["id"];
     careChartValuesJSON["patient"] = currentPatient["id"];
+    emotionChartValuesJSON["patient"] = currentPatient["id"];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -129,6 +160,7 @@ class _AddchartScreenState extends State<AddchartScreen> {
                       if (dropDownValueIndex == 0) buildCareChartColumn(),
                       if (dropDownValueIndex == 1)
                         buildVitalsGrid(constraints.maxWidth),
+                      if (dropDownValueIndex == 2) buildEmotionChartColumn(),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -175,65 +207,6 @@ class _AddchartScreenState extends State<AddchartScreen> {
           );
         }).toList(),
       ),
-    );
-  }
-
-  Widget buildVitalsGrid(double maxWidth) {
-    int crossAxisCount = (maxWidth / 180).floor();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.9,
-          ),
-          itemCount: vitals.length - 1,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            return vitalsInputField(vitals[index], index);
-          },
-        ),
-        Text(
-          vitals.last,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: primaryColor,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            fillColor: secondaryColor,
-            filled: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: const BorderSide(color: Colors.white),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5),
-              borderSide: const BorderSide(color: Colors.white),
-            ),
-          ),
-          onChanged: (value) {
-            vitalsValuesJSON[vitalsValuesJSON.keys.toList().last] = value;
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Enter details';
-            }
-            return null;
-          },
-        ),
-      ],
     );
   }
 
@@ -361,6 +334,65 @@ class _AddchartScreenState extends State<AddchartScreen> {
     );
   }
 
+  Widget buildVitalsGrid(double maxWidth) {
+    int crossAxisCount = (maxWidth / 180).floor();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.9,
+          ),
+          itemCount: vitals.length - 1,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return vitalsInputField(vitals[index], index);
+          },
+        ),
+        Text(
+          vitals.last,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: primaryColor,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            fillColor: secondaryColor,
+            filled: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+              borderSide: const BorderSide(color: Colors.white),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(5),
+              borderSide: const BorderSide(color: Colors.white),
+            ),
+          ),
+          onChanged: (value) {
+            vitalsValuesJSON[vitalsValuesJSON.keys.toList().last] = value;
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Enter details';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
   Widget vitalsInputField(String title, int index) {
     final keys = vitalsValuesJSON.keys.toList();
     return Column(
@@ -370,7 +402,7 @@ class _AddchartScreenState extends State<AddchartScreen> {
           title,
           style: const TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: primaryColor,
           ),
           maxLines: 1,
@@ -405,6 +437,147 @@ class _AddchartScreenState extends State<AddchartScreen> {
           },
         ),
       ],
+    );
+  }
+
+  Widget buildEmotionChartColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 1; i < 3; i++)
+          emotionChartRow1(
+              emotionChart[i], emotionChartValuesJSON.values.toList()[i], i),
+        subTitle("EMOTIONS"),
+        for (var i = 3; i < emotionChart.length; i++)
+          emotionChartRow2(emotionChart[i], i),
+      ],
+    );
+  }
+
+  Widget emotionChartRow1(String title, bool isTrue, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    emotionChartValuesJSON[
+                        emotionChartValuesJSON.keys.toList()[index]] = false;
+                  });
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: !isTrue ? primaryColor : secondaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.close,
+                        color: !isTrue ? Colors.white : primaryColor, size: 24),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    emotionChartValuesJSON[
+                        emotionChartValuesJSON.keys.toList()[index]] = true;
+                  });
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: isTrue ? primaryColor : secondaryColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.check,
+                        color: isTrue ? Colors.white : primaryColor, size: 24),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget emotionChartRow2(String title, int index) {
+    final keys = emotionChartValuesJSON.keys.toList();
+    return Container(
+      padding: const EdgeInsets.only(left: 10, top: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: primaryColor,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const Spacer(),
+          SizedBox(
+            width: 150,
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                fillColor: secondaryColor,
+                filled: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+              ),
+              value: emotionChartValuesJSON[keys[index]],
+              onChanged: (String? newValue) {
+                setState(() {
+                  emotionChartValuesJSON[keys[index]] = newValue;
+                });
+              },
+              items: <String>['low', 'medium', 'high']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value[0].toUpperCase() + value.substring(1)),
+                );
+              }).toList(),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Select value';
+                }
+                return null;
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -465,6 +638,11 @@ class _AddchartScreenState extends State<AddchartScreen> {
                 });
               } else if (dropDownValueIndex == 1) {
                 postVitalChartData().then((_) {
+                  Navigator.pop(context);
+                });
+              } else if (dropDownValueIndex == 2) {
+                print(emotionChartValuesJSON);
+                postEmotionChartData().then((_) {
                   Navigator.pop(context);
                 });
               }

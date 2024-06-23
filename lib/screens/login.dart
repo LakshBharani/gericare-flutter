@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? "*Incorrect username or password"
                         : "",
                     style: const TextStyle(
-                        color: Colors.red,
+                        color: primaryColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600)),
               )
