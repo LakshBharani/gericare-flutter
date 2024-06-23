@@ -54,8 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/splash_image_white.png",
-                height: 150,
+                logoPath,
+                height: 80,
               ),
               const SizedBox(height: 20),
               TextFormField(

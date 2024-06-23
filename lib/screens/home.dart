@@ -164,12 +164,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                             const SizedBox(height: 2),
                                             Row(
                                               children: [
-                                                Text(
-                                                  "${state[index]['master_medication_record']['name']} - ${state[index]['master_medication_record']['dose']}",
-                                                  style: const TextStyle(
-                                                    color: primaryColor,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w600,
+                                                SizedBox(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.55,
+                                                  child: Text(
+                                                    "${state[index]['master_medication_record']['name']} - ${state[index]['master_medication_record']['dose']}",
+                                                    style: const TextStyle(
+                                                      color: primaryColor,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                               ],

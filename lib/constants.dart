@@ -30,3 +30,28 @@ String formatTimestamp(String timestamp) {
   var formatter = DateFormat('dd MMM, yyyy');
   return formatter.format(parsedDate);
 }
+
+// edit screen app bar
+AppBar customAppBar(String title) {
+  return AppBar(
+    backgroundColor: Colors.white,
+    surfaceTintColor: Colors.white,
+    bottom: const PreferredSize(
+      preferredSize: Size.fromHeight(8),
+      child: Divider(
+        color: borderGrey,
+        height: 0,
+      ),
+    ),
+    title: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: appBarTitle,
+      ),
+    ),
+    centerTitle: true,
+    elevation: 0,
+  );
+}

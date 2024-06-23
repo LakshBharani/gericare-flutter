@@ -11,6 +11,7 @@ import 'package:gericare/cubits/selected_vitals_chart.dart';
 import 'package:gericare/db_service.dart';
 import 'package:gericare/widgets/patient-details/constants.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class ChartsSubSection extends StatefulWidget {
   const ChartsSubSection({super.key});
@@ -90,7 +91,8 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                           padding: const EdgeInsets.only(bottom: 100),
                           itemCount: filteredCareData.length +
                               filteredVitalsData.length +
-                              filteredEmotionData.length,
+                              filteredEmotionData.length +
+                              1,
                           itemBuilder: (context, index) {
                             if (index < filteredCareData.length) {
                               return chartCard(
@@ -109,7 +111,10 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                                     ['name'],
                                 filteredVitalsData[vitalsIndex]['id'],
                               );
-                            } else {
+                            } else if (index <
+                                filteredCareData.length +
+                                    filteredVitalsData.length +
+                                    filteredEmotionData.length) {
                               final emotionIndex = index -
                                   (filteredCareData.length +
                                       filteredVitalsData.length);
@@ -120,26 +125,77 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
                                 filteredEmotionData[emotionIndex]['id'],
                               );
                             }
+                            if (_selectedDay.toIso8601String().split('T')[0] ==
+                                DateTime.now()
+                                    .toIso8601String()
+                                    .split('T')[0]) {
+                              return addChartWidget();
+                            } else {
+                              return null;
+                            }
                           },
                         ),
                       )
-                    : Expanded(
-                        child: Center(
-                          child: Text(
-                            "No charts for this date",
-                            style: TextStyle(
-                              color: Colors.grey.shade400,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
+                    : (_selectedDay.toIso8601String().split('T')[0] ==
+                            DateTime.now().toIso8601String().split('T')[0])
+                        ? addChartWidget()
+                        : Expanded(
+                            child: Center(
+                              child: Text(
+                                "No charts for this date",
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget addChartWidget() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, '/add-chart');
+      },
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        radius: const Radius.circular(16),
+        color: primaryColor.withOpacity(0.5),
+        dashPattern: const [8, 4],
+        strokeWidth: 2,
+        child: Container(
+          height: 65,
+          decoration: BoxDecoration(
+            color: secondaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+              child: Wrap(
+            children: [
+              Icon(
+                Icons.add,
+                color: primaryColor.withOpacity(0.5),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                "Add Chart",
+                style: TextStyle(
+                  color: primaryColor.withOpacity(0.5),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          )),
+        ),
+      ),
     );
   }
 
@@ -258,13 +314,13 @@ class _ChartsSubSectionState extends State<ChartsSubSection> {
           return Container(
             margin: const EdgeInsets.all(6.0),
             decoration: const BoxDecoration(
-              color: primaryColor,
+              color: secondaryColor,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 day.day.toString(),
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: primaryColor),
               ),
             ),
           );

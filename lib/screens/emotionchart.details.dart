@@ -31,6 +31,17 @@ class EmotionChartDetailsScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () {
+                Navigator.pushNamed(context, '/emotionChart-edit');
+              },
+            ),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -54,34 +65,34 @@ class EmotionChartDetailsScreen extends StatelessWidget {
   }
 }
 
-Widget subTitle(String title) {
-  return Column(
-    children: [
-      const SizedBox(height: 20),
-      Row(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: appBarTitle,
-            ),
-          ),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Divider(
-                color: appBarTitle,
-                thickness: 0.5,
-              ),
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
-}
+// Widget subTitle(String title) {
+//   return Column(
+//     children: [
+//       const SizedBox(height: 20),
+//       Row(
+//         children: [
+//           Text(
+//             title,
+//             style: const TextStyle(
+//               fontSize: 12,
+//               fontWeight: FontWeight.w500,
+//               color: appBarTitle,
+//             ),
+//           ),
+//           const Expanded(
+//             child: Padding(
+//               padding: EdgeInsets.symmetric(horizontal: 10),
+//               child: Divider(
+//                 color: appBarTitle,
+//                 thickness: 0.5,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     ],
+//   );
+// }
 
 Widget rowItem1(String title, dynamic isTrue) {
   return Padding(

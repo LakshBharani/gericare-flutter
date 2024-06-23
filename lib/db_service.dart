@@ -163,10 +163,11 @@ class DbService {
   }
 
   // get care chart records using a bearer access token from the server
-  Future<Map<String, dynamic>> fetchCareChartRecords(String accessToken) async {
+  Future<Map<String, dynamic>> fetchCareChartRecords(
+      String accessToken, int patientId) async {
     try {
       final response = await dio.get(
-        '$baseUrl/charts/care/',
+        '$baseUrl/charts/care/?patient__id=$patientId',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -197,10 +198,10 @@ class DbService {
 
   // get vital chart records using a bearer access token from the server
   Future<Map<String, dynamic>> fetchVitalChartRecords(
-      String accessToken) async {
+      String accessToken ,int currentPatientId) async {
     try {
       final response = await dio.get(
-        '$baseUrl/charts/vitals/',
+        '$baseUrl/charts/vitals/?patient__id=$currentPatientId',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -230,10 +231,10 @@ class DbService {
 
   // get emotional chart records using a bearer access token from the server
   Future<Map<String, dynamic>> fetchEmotionalChartRecords(
-      String accessToken) async {
+      String accessToken, int currentPatientId) async {
     try {
       final response = await dio.get(
-        '$baseUrl/charts/emotions/',
+        '$baseUrl/charts/emotions/?patient__id=$currentPatientId',
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',

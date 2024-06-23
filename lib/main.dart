@@ -10,6 +10,8 @@ import 'package:gericare/cubits/reminders.dart';
 import 'package:gericare/cubits/selected_care_chart.dart';
 import 'package:gericare/cubits/selected_emotion_chart.dart';
 import 'package:gericare/cubits/selected_vitals_chart.dart';
+import 'package:gericare/screens/add_chart.dart';
+import 'package:gericare/screens/careChart.edit.dart';
 import 'package:gericare/screens/carechart.details.dart';
 import 'package:gericare/screens/emotionchart.details.dart';
 import 'package:gericare/screens/home.dart';
@@ -56,6 +58,8 @@ class MyApp extends StatelessWidget {
           '/vitalsChart-details': (context) => const VitalsChartDetailsScreen(),
           '/emotionsChart-details': (context) =>
               const EmotionChartDetailsScreen(),
+          '/careChart-edit': (context) => const CareChartEditScreen(),
+          '/add-chart': (context) => const AddchartScreen(),
         },
       ),
     );

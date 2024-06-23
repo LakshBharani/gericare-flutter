@@ -48,23 +48,21 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     currentPatientInfoCubit.updateData(patientData);
   }
 
-  void fetchCareChartData() async {
+  void fetchCareChartData(int id) async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
+
     String accessToken = authInfoCubit.state['access_token'];
     final refreshToken = authInfoCubit.state['refresh_token'];
     final newToken = await dbservice.refreshAccessToken(refreshToken);
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
-    final careChartData = await dbservice.fetchCareChartRecords(accessToken);
-    // filter out those records that are not of the current patient
-    careChartData['results'].removeWhere((element) =>
-        element['patient']['id'] !=
-        BlocProvider.of<CurrentPatientInfo>(context).state['id']);
+    final careChartData =
+        await dbservice.fetchCareChartRecords(accessToken, id);
     chartsCubit.updateCharts("care", careChartData);
   }
 
-  void fetchVitalsChartData() async {
+  void fetchVitalsChartData(int id) async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
     String accessToken = authInfoCubit.state['access_token'];
@@ -72,30 +70,21 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     final newToken = await dbservice.refreshAccessToken(refreshToken);
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
-    final vitalChartData = await dbservice.fetchVitalChartRecords(accessToken);
-    // filter out those records that are not of the current patient
-    vitalChartData['results'].removeWhere((element) =>
-        element['patient']['id'] !=
-        BlocProvider.of<CurrentPatientInfo>(context).state['id']);
+    final vitalChartData =
+        await dbservice.fetchVitalChartRecords(accessToken, id);
     chartsCubit.updateCharts("vitals", vitalChartData);
   }
 
-  void fetchEmotionChartData() async {
+  void fetchEmotionChartData(int id) async {
     final chartsCubit = BlocProvider.of<ChartsInfoCubit>(context);
     final authInfoCubit = BlocProvider.of<AuthInfoCubit>(context);
-    final currentPatientInfoCubit =
-        BlocProvider.of<CurrentPatientInfo>(context);
     String accessToken = authInfoCubit.state['access_token'];
     final refreshToken = authInfoCubit.state['refresh_token'];
     final newToken = await dbservice.refreshAccessToken(refreshToken);
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
     final emotionChartData =
-        await dbservice.fetchEmotionalChartRecords(accessToken);
-    // filter out those records that are not of the current patient
-    emotionChartData['results'].removeWhere((element) =>
-        element['patient']['id'] != currentPatientInfoCubit.state['id']);
-    emotionChartData['count'] = emotionChartData['results'].length;
+        await dbservice.fetchEmotionalChartRecords(accessToken, id);
     chartsCubit.updateCharts("emotion", emotionChartData);
   }
 
@@ -108,7 +97,11 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
     accessToken = newToken['access'];
     authInfoCubit.updateAccessToken(accessToken);
     final documents = await dbservice.fetchDocuments(accessToken, id);
-    documentListCubit.updateData(documents);
+    if (documents.isNotEmpty) {
+      documentListCubit.updateData(documents);
+    } else {
+      documentListCubit.updateData({});
+    }
   }
 
   @override
@@ -118,9 +111,9 @@ class _PatientDetailsScreenState extends State<PatientDetailsScreen> {
         <String, dynamic>{}) as Map;
     final id = arguments['id'] as int;
     fetchPatientDetails(id);
-    fetchCareChartData();
-    fetchVitalsChartData();
-    fetchEmotionChartData();
+    fetchCareChartData(id);
+    fetchVitalsChartData(id);
+    fetchEmotionChartData(id);
     fetchDocuments(id);
 
     return DefaultTabController(

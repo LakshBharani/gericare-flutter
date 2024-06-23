@@ -18,7 +18,7 @@ class OnboardingScreen extends StatelessWidget {
                 children: [
                   Image.asset(
                     logoPath,
-                    height: 107,
+                    height: 80,
                   ),
                   const SizedBox(height: 20),
                   const Text(
