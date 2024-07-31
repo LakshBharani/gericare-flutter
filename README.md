@@ -1,5 +1,7 @@
 # GeriCare
 
+<img width="633" alt="Screenshot 2024-08-01 at 12 17 55 AM" src="https://github.com/user-attachments/assets/5dc2bc35-104e-485c-b3bd-f86f656eedff">
+
 GeriCare is a comprehensive healthcare management app designed specifically for GeriCare Hospital in Tamil Nadu. This app leverages Flutter for the frontend, Django for the backend, and Cubit/BLoC for state management to provide a seamless and efficient user experience.
 
 ## Introduction
